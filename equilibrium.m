@@ -177,7 +177,7 @@ while(notStabilized)
     % se signed_B è full rank, cioè il numero di colonne è uguale al rango
     if rank(signed_B) == size(signed_B, 2)
         signed_beta_star = (transpose(signed_B)*signed_B) \ (transpose(signed_B) * transpose(a - d));
-        beta_newnode =  - v(1:n) * signed_beta_star / v(n+1)
+        beta_newnode =  - v(1:n) * signed_beta_star / v(n+1);
         signed_beta_star = cat(1, signed_beta_star, beta_newnode)
     end
     
@@ -187,8 +187,9 @@ while(notStabilized)
     % adesso abbiamo hat_a_J; per essere stabile i suoi autovalori devono 
     % avere parte reale negativa
     
-    hat_a_J(lambda) = a_J(lambda, beta_array{:});
-    tmp = coeffs(hat_a_J(lambda));
+    hat_a_J = a_J(lambda, beta_array{:})
+    
+    tmp = coeffs(hat_a_J, 'All');
     eigenvalues = roots(tmp);
     for i = 1:size(eigenvalues,2)
         if(((real(eigenvalues(i))) > 0) && (eigenvalues(i) ~= 0))
