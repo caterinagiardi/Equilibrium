@@ -13,7 +13,6 @@ q = zeros(n,1);
 p = sym(zeros(n,1));
 I = eye(n); 
 
-
 %   STEP 1: find alpha (together with beta they make up the interaction 
 %   coefficient)
 
@@ -25,7 +24,6 @@ alpha = zeros(n+1, 1);
 target_f = growth_function(target, l, k, n);
 target_g = interaction_function(M, target, n);
 
-
 %   now we can proceed with calculating alpha
 %   sum contains the sum over rows of the g matrix minus the g(i,j) with 
 %   i = j. 
@@ -35,7 +33,6 @@ target_g = interaction_function(M, target, n);
 for i = 1:n+1
     alpha(i) = (-1 / (target_g(i, n+1))) .* (target_f(i) + sum(target_g(i,:)) - target_g(i, i));
 end
-
 
 %   we also need the derivative of the growth function(f) and the
 %   interaction function(g)
@@ -56,15 +53,7 @@ sym beta;
 beta = sym('beta',[1, n+1]);
 beta_array = sym2cell(beta);
 
-
-
-%p(beta, i) = beta(i) * diff_target_g(n+1, i, 1);
-
 r(beta) = beta(n+1) * diff_target_f(n+1);
-
-% p(beta, i) = beta(i) * diff_target_g(n+1, i, 1);
-
-
 
 for i = 1:n
 
@@ -75,31 +64,25 @@ for i = 1:n
 
     for j = 1:n
         if j ~= i
+
             G(i,j) = diff_target_g(i,j,2);
 
             % per implementare la sommatoria scorro su tutti i j della i
             % corrente
+
             G(i,i) = G(i,i) + diff_target_g(i,j,1);
-            
             
         end
     end
 end
 
-
-% lambda = sym('lambda',[1, n+1]);
 syms lambda;
 
-
-% a_G = det(lambda(1:n)*I - G);
 a_G = det(lambda * I - G);
 
-% A_G(lambda) = adjugate_matrix(lambda(1:n)*I - G);
 A_G = adjoint(lambda * I - G);
 
-
-a_J(beta_array{:}) = (lambda - r(beta_array{:})) * a_G - p(1:n) * A_G * q
-size_aj = size(a_J)
+a_J(beta_array{:}) = (lambda - r(beta_array{:})) * a_G - transpose(p) * A_G * q;
 
 % b has a dimension of n+1, it is distributed in 2 variables (b_1_to_n and
 % b_newnode)
@@ -127,7 +110,6 @@ size_a = size(a);
 
 % First, we calculate b_j(lambda)
 
-
 b = sym(zeros(n+1));
 s = sym(zeros(n+1));
 
@@ -138,7 +120,6 @@ for j = 1:n
     b(j) = - diff_target_g(n+1, j, 1) * a_G - diff_target_g(n+1, j, 2) * s(j);
 end
 b(n+1) = - diff_target_f(n+1) * a_G;
-
 
 % Then, we fill the B matrix (it will not contain lambda because it takes
 % the coefficient on the polynomial of lambda)
@@ -155,20 +136,16 @@ for j = 1:n+1
    end
 end
 
-
 % B matrix is n+1 x n+1 and it contains all the couefficients of the
 % polynomials b. signed_B is instead n+1 x n. We then calculate
 % signed_beta_star which contains the first n betas. To calculate the last
 % beta_newnode we rely on equation (26).
-
 
 size_B = size(B);
 signed_B = B(:,1:n) - B(:,n+1)*v(1:n)/v(n+1);
 size_signed_B = size(signed_B);
 beta_star = zeros(n);
 notStabilized = true;
-
-
 
 while(notStabilized)
     notStabilized = false;
@@ -192,13 +169,11 @@ while(notStabilized)
         r = r + signed_beta_star(i) * diff_target_g(n+1, i, 1);
     end
 
-    hat_a_J = (lambda - r) * a_G - p(1:n) * A_G * q;
+    hat_a_J = (lambda - r) * a_G - transpose(p) * A_G * q;
     
-
-
-    tmp = coeffs(hat_a_J, lambda, 'All');
-    eigenvalues = roots(tmp);
-    for i = 1:size(eigenvalues,2)
+    tmp = coeffs(hat_a_J, lambda, 'All')
+    eigenvalues = roots(tmp)
+    for i = 1:size(eigenvalues, 2)
         if(((real(eigenvalues(i))) > 0) && (eigenvalues(i) ~= 0))
             notStabilized = true;
         else 
