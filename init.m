@@ -14,11 +14,11 @@ M = [[-0.21, 0.10, 0.17, -0.16, -0.14, 0.02, -0.52, -0.40, 0.35, 0.01, -0.27];
 
 %k = [  ];
 % num positivi k e l 
-k = rand(1,n+1);
+k = rand(n+1, 1);
 
 % sempre positiva l 
 %l = [  ];
-l = rand(1, n);
+l = rand(n, 1);
 
 %target = [ ];
 % sempre positiva anche target

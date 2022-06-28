@@ -6,18 +6,18 @@ function [outputArg1] = equilibrium(M, k, l, n, target)
 %   g(i, j) interaction functions between species i and j
 %   m(i, j) interaction coefficients: j is the prey and i the predator
 
-target_f = zeros(n+1);
-target_g = zeros(n+1);
-G = zeros(n, n);
-q = zeros(n);
-p = sym(zeros(n));
+target_f = zeros(n+1, 1);
+target_g = zeros(n+1, 1);
+G = zeros(n);
+q = zeros(n,1);
+p = sym(zeros(n,1));
 I = eye(n); 
 
 
 %   STEP 1: find alpha (together with beta they make up the interaction 
 %   coefficient)
 
-alpha = zeros(n+1);
+alpha = zeros(n+1, 1);
 
 %   first we need the growth function and interaction function calculated 
 %   in the target
@@ -52,9 +52,9 @@ diff_target_g = diff_interaction_function(target, M, n);
 %   we calculate the matrix G (nxn) : the Jacobian of the system 
 %   defined over the original n-node network, as well as p, q and r
 
-
+sym beta;
 beta = sym('beta',[1, n+1]);
-beta_array = num2cell(beta);
+beta_array = sym2cell(beta);
 
 
 
@@ -98,9 +98,8 @@ a_G = det(lambda * I - G);
 A_G = adjoint(lambda * I - G);
 
 
-a_J(lambda, beta_array{:}) = (lambda - r(beta_array{:})) * a_G - p(1:n) * A_G * q
-
-
+a_J(beta_array{:}) = (lambda - r(beta_array{:})) * a_G - p(1:n) * A_G * q
+size_aj = size(a_J)
 
 % b has a dimension of n+1, it is distributed in 2 variables (b_1_to_n and
 % b_newnode)
@@ -140,7 +139,6 @@ for j = 1:n
 end
 b(n+1) = - diff_target_f(n+1) * a_G;
 
-b(1)
 
 % Then, we fill the B matrix (it will not contain lambda because it takes
 % the coefficient on the polynomial of lambda)
@@ -164,11 +162,13 @@ end
 % beta_newnode we rely on equation (26).
 
 
-size_B = size(B)
+size_B = size(B);
 signed_B = B(:,1:n) - B(:,n+1)*v(1:n)/v(n+1);
-size_signed_B = size(signed_B)
+size_signed_B = size(signed_B);
 beta_star = zeros(n);
 notStabilized = true;
+
+
 
 while(notStabilized)
     notStabilized = false;
@@ -180,16 +180,23 @@ while(notStabilized)
         beta_newnode =  - v(1:n) * signed_beta_star / v(n+1);
         signed_beta_star = cat(1, signed_beta_star, beta_newnode)
     end
-    
-    % converto il vettore beta_star per poterlo usare come input in a_J
-        beta_array = num2cell(signed_beta_star);
+ 
+    % ricalcolo r e p con i nuovi beta
 
-    % adesso abbiamo hat_a_J; per essere stabile i suoi autovalori devono 
-    % avere parte reale negativa
+    r = signed_beta_star(n+1) * diff_target_f(n+1);
+
+    % p(beta, i) = beta(i) * diff_target_g(n+1, i, 1);
     
-    hat_a_J = a_J(lambda, beta_array{:})
+    for i = 1:n
+        p(i) = signed_beta_star(i) * diff_target_g(n+1, i, 1);
+        r = r + signed_beta_star(i) * diff_target_g(n+1, i, 1);
+    end
+
+    hat_a_J = (lambda - r) * a_G - p(1:n) * A_G * q;
     
-    tmp = coeffs(hat_a_J, 'All');
+
+
+    tmp = coeffs(hat_a_J, lambda, 'All');
     eigenvalues = roots(tmp);
     for i = 1:size(eigenvalues,2)
         if(((real(eigenvalues(i))) > 0) && (eigenvalues(i) ~= 0))
