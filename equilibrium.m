@@ -169,11 +169,13 @@ while(notStabilized)
         r = r + signed_beta_star(i) * diff_target_g(n+1, i, 1);
     end
 
-    hat_a_J = (lambda - r) * a_G - transpose(p) * A_G * q
-    s_hat_a_J = simplify(hat_a_J)
-    %tmp = coeffs(hat_a_J, lambda, 'All')
-    prva = solve(lambda^2-lambda-6)
+    hat_a_J = (lambda - r) * a_G - transpose(p) * A_G * q;
+
+    % tmp = coeffs(hat_a_J, lambda, 'All');
+    % eigenvalues = roots(hat_a_J);
+
     eigenvalues = solve(hat_a_J)
+
     for i = 1:size(eigenvalues, 2)
         if(((real(eigenvalues(i))) > 0) && (real(eigenvalues(i)) ~= 0))
             notStabilized = true;
