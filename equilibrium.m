@@ -174,7 +174,16 @@ while(notStabilized)
     % tmp = coeffs(hat_a_J, lambda, 'All');
     % eigenvalues = roots(hat_a_J);
 
-    eigenvalues = solve(hat_a_J)
+    % eigenvalues = solve(hat_a_J)
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % MODIFICATO DA GB
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    coeff_hat_a_J = coeffs(hat_a_J);
+    eigenvalues = roots(coeff_hat_a_J);
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     for i = 1:size(eigenvalues, 2)
         if(((real(eigenvalues(i))) > 0) && (real(eigenvalues(i)) ~= 0))
@@ -186,7 +195,15 @@ while(notStabilized)
 
 end
 
-outputArg1 = a_J(lambda ,beta_array{:});
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MODIFICATO DA GB
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%outputArg1 = a_J(lambda ,beta_array{:});
+outputArg1 = a_J(beta_array{:});
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+end
 end
 
