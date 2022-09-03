@@ -1,5 +1,5 @@
-function [outputArg1] = equilibrium(M, k, l, n, target)
-%EQUILIBRIUM Summary of this function goes here
+function output = equilibrium(M, k, l, n, target)
+%   EQUILIBRIUM
 %   n different species
 %   x(i) population density of species i 
 %   f(i) growth function for species i
@@ -90,6 +90,8 @@ a_J(beta_array{:}) = (lambda - r(beta_array{:})) * a_G - transpose(p) * A_G * q;
 
 B = zeros(n+1, n+1);
 
+
+%%%%%%%%% CONTROLLA CHE LA SIGNED_b SIA AGGIORNATA CON IL NUOVO SIGMA %%%%%
 sigma = rand(1)*10;
 target_a_J = (lambda + sigma)*(lambda + 100 * sigma)^n;
 a = fliplr(coeffs(target_a_J, 'All'));
@@ -100,11 +102,8 @@ a = a(1:n+1);
 d = fliplr(coeffs((lambda * a_G), 'All'));
 d = d(1:n+1);
 
-size_d = size(d);
-size_a = size(a);
-
 % B structure: b(j,i) is the i-degree coefficients of the polynomials b(j)
-% so i goes from 1, that is 0-degree, to n+1, that is the n-degree
+% so i goes from 1, that is the 0-degree, to n+1, that is the n-degree
 % instead j goes from 1, that is the first polynomial, to n+1, that is the
 % last one.
 
@@ -136,22 +135,23 @@ for j = 1:n+1
    end
 end
 
-% B matrix is n+1 x n+1 and it contains all the couefficients of the
+% B matrix is n+1 x n+1 and it contains all the coefficients of the
 % polynomials b. signed_B is instead n+1 x n. We then calculate
 % signed_beta_star which contains the first n betas. To calculate the last
 % beta_newnode we rely on equation (26).
 
-size_B = size(B);
 signed_B = B(:,1:n) - B(:,n+1)*v(1:n)/v(n+1);
-size_signed_B = size(signed_B);
 beta_star = zeros(n);
 notStabilized = true;
 
 while(notStabilized)
     notStabilized = false;
     sigma = sigma*0.9;
+    target_a_J = (lambda + sigma)*(lambda + 100 * sigma)^n;
+    a = fliplr(coeffs(target_a_J, 'All'));
+    a = a(1:n+1);
 
-    % se signed_B Ã¨ full rank, cioÃ¨ il numero di colonne Ã¨ uguale al rango
+    % se signed_B è full rank, cioè il numero di colonne è uguale al rango
     if rank(signed_B) == size(signed_B, 2)
         signed_beta_star = (transpose(signed_B)*signed_B) \ (transpose(signed_B) * transpose(a - d));
         beta_newnode =  - v(1:n) * signed_beta_star / v(n+1);
@@ -173,7 +173,6 @@ while(notStabilized)
 
     % tmp = coeffs(hat_a_J, lambda, 'All');
     % eigenvalues = roots(hat_a_J);
-
     % eigenvalues = solve(hat_a_J)
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -200,7 +199,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %outputArg1 = a_J(lambda ,beta_array{:});
-outputArg1 = a_J(beta_array{:});
+output = a_J(beta_array{:});
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
