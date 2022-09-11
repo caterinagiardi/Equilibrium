@@ -20,4 +20,6 @@ for i = 1:n
     result(i, n+1) = g_newnode(input_x(i), input_x(n+1));
     result(n+1, i) = g_newnode(input_x(i), input_x(n+1));
 end
+result(n+1, n+1) = g_newnode(input_x(n+1), input_x(n+1));
+
 end

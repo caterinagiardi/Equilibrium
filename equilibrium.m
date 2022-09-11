@@ -31,7 +31,11 @@ target_g = interaction_function(M, target, n);
 % NB: we need target_g(i,n+1) != 0
 
 for i = 1:n+1
-    alpha(i) = (-1 / (target_g(i, n+1))) .* (target_f(i) + sum(target_g(i,:)) - target_g(i, i));
+    target_g(i, n+1)
+    target_f(i)
+    sum(target_g(i,:))
+    target_g(i, i)
+    alpha(i) = (-1 / (target_g(i, n+1))) * (target_f(i) + sum(target_g(i,:)) - target_g(i, i))
 end
 
 %   we also need the derivative of the growth function(f) and the
@@ -91,7 +95,6 @@ a_J(beta_array{:}) = (lambda - r(beta_array{:})) * a_G - transpose(p) * A_G * q;
 B = zeros(n+1, n+1);
 
 
-%%%%%%%%% CONTROLLA CHE LA SIGNED_b SIA AGGIORNATA CON IL NUOVO SIGMA %%%%%
 sigma = rand(1)*10;
 target_a_J = (lambda + sigma)*(lambda + 100 * sigma)^n;
 a = fliplr(coeffs(target_a_J, 'All'));
@@ -143,6 +146,7 @@ end
 signed_B = B(:,1:n) - B(:,n+1)*v(1:n)/v(n+1);
 beta_star = zeros(n);
 notStabilized = true;
+epsilon = 0.00005;
 
 while(notStabilized)
     notStabilized = false;
@@ -180,19 +184,22 @@ while(notStabilized)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     coeff_hat_a_J = coeffs(hat_a_J);
-    eigenvalues = roots(coeff_hat_a_J);
+    eigenvalues = roots(coeff_hat_a_J)
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    for i = 1:size(eigenvalues, 2)
+    
+    notStabilized = false;
+    for i = 1:length(eigenvalues)
         if(((real(eigenvalues(i))) > 0) && (real(eigenvalues(i)) ~= 0))
             notStabilized = true;
-        else 
-            notStabilized = false;
         end
     end
 
 end
+
+alpha
+signed_beta_star
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MODIFICATO DA GB
@@ -202,6 +209,14 @@ end
 output = a_J(beta_array{:});
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%   now we have to find the equilibrium values, which are given by (33)
+
+%   equilibrium_x = - inv(M)*(l + target(n+1)*alpha)
+
+
+
 
 end
 
