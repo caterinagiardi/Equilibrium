@@ -31,12 +31,9 @@ target_g = interaction_function(M, target, n);
 % NB: we need target_g(i,n+1) != 0
 
 for i = 1:n+1
-    target_g(i, n+1)
-    target_f(i)
-    sum(target_g(i,:))
-    target_g(i, i)
-    alpha(i) = (-1 / (target_g(i, n+1))) * (target_f(i) + sum(target_g(i,:)) - target_g(i, i))
+    alpha(i) = (-1 / (target_g(i, n+1))) * (target_f(i) + sum(target_g(i,:)) - target_g(i, i));
 end
+alpha
 
 %   we also need the derivative of the growth function(f) and the
 %   interaction function(g)
@@ -150,12 +147,12 @@ epsilon = 0.00005;
 
 while(notStabilized)
     notStabilized = false;
-    sigma = sigma*0.9;
+    sigma = sigma*0.9
     target_a_J = (lambda + sigma)*(lambda + 100 * sigma)^n;
     a = fliplr(coeffs(target_a_J, 'All'));
     a = a(1:n+1);
 
-    % se signed_B è full rank, cioè il numero di colonne è uguale al rango
+    % se signed_B ? full rank, cio? il numero di colonne ? uguale al rango
     if rank(signed_B) == size(signed_B, 2)
         signed_beta_star = (transpose(signed_B)*signed_B) \ (transpose(signed_B) * transpose(a - d));
         beta_newnode =  - v(1:n) * signed_beta_star / v(n+1);
@@ -198,7 +195,7 @@ while(notStabilized)
 end
 
 alpha
-signed_beta_star
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -206,12 +203,14 @@ signed_beta_star
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %outputArg1 = a_J(lambda ,beta_array{:});
-output = a_J(beta_array{:});
+
+output = a_J(signed_beta_star);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%   now we have to find the equilibrium values, which are given by (33)
+%   now we have to find the equilibrium values, which are given by noooooo
+%   (33)
 
 %   equilibrium_x = - inv(M)*(l + target(n+1)*alpha)
 
@@ -219,4 +218,5 @@ output = a_J(beta_array{:});
 
 
 end
+
 
