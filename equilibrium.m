@@ -187,7 +187,7 @@ while(notStabilized)
     
     notStabilized = false;
     for i = 1:length(eigenvalues)
-        if(((real(eigenvalues(i))) > 0) && (real(eigenvalues(i)) ~= 0))
+        if((real(eigenvalues(i))) > - epsilon)
             notStabilized = true;
         end
     end
@@ -218,5 +218,4 @@ output = a_J(signed_beta_star);
 
 
 end
-
 
