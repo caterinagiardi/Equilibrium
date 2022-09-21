@@ -144,10 +144,18 @@ signed_B = B(:,1:n) - B(:,n+1)*v(1:n)/v(n+1);
 beta_star = zeros(n);
 notStabilized = true;
 epsilon = 0.00005;
+iterations = 0;
 
 while(notStabilized)
     notStabilized = false;
-    sigma = sigma*0.9
+    iterations = iterations + 1;
+    
+    if(iterations == 100)
+        sigma = rand(1)*10;
+    else
+        sigma = sigma*0.9
+    end
+    
     target_a_J = (lambda + sigma)*(lambda + 100 * sigma)^n;
     a = fliplr(coeffs(target_a_J, 'All'));
     a = a(1:n+1);
@@ -171,19 +179,9 @@ while(notStabilized)
     end
 
     hat_a_J = (lambda - r) * a_G - transpose(p) * A_G * q;
-
-    % tmp = coeffs(hat_a_J, lambda, 'All');
-    % eigenvalues = roots(hat_a_J);
-    % eigenvalues = solve(hat_a_J)
-
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % MODIFICATO DA GB
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     coeff_hat_a_J = coeffs(hat_a_J);
     eigenvalues = roots(coeff_hat_a_J)
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     notStabilized = false;
     for i = 1:length(eigenvalues)
@@ -195,26 +193,29 @@ while(notStabilized)
 end
 
 alpha
+iterations
+
+%   now we find the equilibrium point
+% final_x = zero(n+1, 1);
+% 
+% x = sym('x',[1, n+1]);
+% x_array = sym2cell(x);
+% 
+% syms x l k;
+% f(x, i) = l(i) * x(i) * (1 - (x(i) / k(i)));
+% syms y m;
+% g(x, i, j) = M(i,j) * x(i) * target(j);
+% 
+% for i = 1:n
+%     for j = 1:n
+%         sum(x) = 
+%     tmp(x) = f(x, i) + 
 
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% MODIFICATO DA GB
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%outputArg1 = a_J(lambda ,beta_array{:});
-
-output = a_J(signed_beta_star);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%   now we have to find the equilibrium values, which are given by noooooo
-%   (33)
-
-%   equilibrium_x = - inv(M)*(l + target(n+1)*alpha)
-
-
+beta_cell = num2cell(signed_beta_star);
+coefficients = coeffs(a_J(beta_cell{:}));
+p = poly2sym(coefficients, lambda)
+output = (a_J(beta_cell{:}));
 
 
 end
