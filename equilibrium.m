@@ -145,17 +145,17 @@ beta_star = zeros(n);
 notStabilized = true;
 epsilon = 0.00005;
 iterations = 0;
+% sigma = 0.1;
 
 while(notStabilized)
     notStabilized = false;
-    iterations = iterations + 1;
+    iterations = iterations + 1
     
-    if(iterations == 100)
-        sigma = rand(1)*10;
-    else
-        sigma = sigma*0.9
+    if(iterations > 150)
+        notStabilized = true
+        break
     end
-    
+    sigma = sigma*0.9
     target_a_J = (lambda + sigma)*(lambda + 100 * sigma)^n;
     a = fliplr(coeffs(target_a_J, 'All'));
     a = a(1:n+1);
@@ -164,9 +164,9 @@ while(notStabilized)
     if rank(signed_B) == size(signed_B, 2)
         signed_beta_star = (transpose(signed_B)*signed_B) \ (transpose(signed_B) * transpose(a - d));
         beta_newnode =  - v(1:n) * signed_beta_star / v(n+1);
-        signed_beta_star = cat(1, signed_beta_star, beta_newnode)
+        signed_beta_star = cat(1, signed_beta_star, beta_newnode);
     end
- 
+    
     % ricalcolo r e p con i nuovi beta
 
     r = signed_beta_star(n+1) * diff_target_f(n+1);
@@ -183,39 +183,64 @@ while(notStabilized)
     coeff_hat_a_J = coeffs(hat_a_J);
     eigenvalues = roots(coeff_hat_a_J)
     
+    eigenvalues_data(iterations, :) = eigenvalues
     notStabilized = false;
     for i = 1:length(eigenvalues)
         if((real(eigenvalues(i))) > - epsilon)
             notStabilized = true;
         end
+        
     end
 
 end
 
+if(notStabilized)
+    return
+end
+
+signed_beta_star
 alpha
 iterations
 
-%   now we find the equilibrium point
-% final_x = zero(n+1, 1);
-% 
-% x = sym('x',[1, n+1]);
-% x_array = sym2cell(x);
-% 
-% syms x l k;
-% f(x, i) = l(i) * x(i) * (1 - (x(i) / k(i)));
-% syms y m;
-% g(x, i, j) = M(i,j) * x(i) * target(j);
-% 
-% for i = 1:n
-%     for j = 1:n
-%         sum(x) = 
-%     tmp(x) = f(x, i) + 
+% Now we verify that the new equilibrium satisfies the equilibrium condition
+% using the parameters we just obtained.
 
+for i = 1:n
+    equilibrium_eq1 = target_f(i) + alpha(i)*target_g(i, n+1);
+    for j = 1:n+1
+        equilibrium_eq1 = equilibrium_eq1 + target_g(i,j);
+    end
+end
+
+if equilibrium_eq1 == 0
+        ee = "OK"
+else
+        equilibrium_eq1
+end
+
+
+equilibrium_eq1 = signed_beta_star(n+1)*target_f(n+1);
+for j = 1:n
+    equilibrium_eq1 = equilibrium_eq1 + signed_beta_star(j)*target_g(n+1,j)
+end
+
+if equilibrium_eq1 == 0
+        ee = "OK"
+else
+        equilibrium_eq1
+end
+
+hold on
+for i = 1:n+1
+    figure
+    plot(eigenvalues_data(:, i), '*');
+end
+hold off
 
 beta_cell = num2cell(signed_beta_star);
 coefficients = coeffs(a_J(beta_cell{:}));
 p = poly2sym(coefficients, lambda)
-output = (a_J(beta_cell{:}));
+output = (p);
 
 
 end

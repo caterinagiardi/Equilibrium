@@ -16,4 +16,4 @@ f_newnode(x, k) = x * (1 - (x / k));
 for i = 1:n
     result(i, 1) = f(input_x(i), input_l(i), input_k(i));
 end
-result(n+1, 1) = f_newnode(input_x(n+1), input_k(n));
+result(n+1, 1) = f_newnode(input_x(n+1), input_k(n+1));
