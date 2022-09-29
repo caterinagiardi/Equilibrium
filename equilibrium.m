@@ -151,7 +151,7 @@ while(notStabilized)
     notStabilized = false;
     iterations = iterations + 1
     
-    if(iterations > 150)
+    if(iterations > 100)
         notStabilized = true
         break
     end
@@ -181,17 +181,23 @@ while(notStabilized)
     hat_a_J = (lambda - r) * a_G - transpose(p) * A_G * q;
     
     coeff_hat_a_J = coeffs(hat_a_J);
-    eigenvalues = roots(coeff_hat_a_J)
+    eigenvalues = roots(coeff_hat_a_J);
     
-    eigenvalues_data(iterations, :) = eigenvalues
+    for i = 1:length(eigenvalues)
+        ev_real(i) = real(eigenvalues(i));
+        ev_imag(i) = imag(eigenvalues(i));
+    end
+   
+    eigenvalues_data(iterations, :) = eigenvalues;
+    real_data(iterations, :) = ev_real;
+    imag_data(iterations, :) = ev_imag;
+    
     notStabilized = false;
     for i = 1:length(eigenvalues)
         if((real(eigenvalues(i))) > - epsilon)
             notStabilized = true;
         end
-        
     end
-
 end
 
 if(notStabilized)
@@ -201,6 +207,7 @@ end
 signed_beta_star
 alpha
 iterations
+eigenvalues_data
 
 % Now we verify that the new equilibrium satisfies the equilibrium condition
 % using the parameters we just obtained.
@@ -218,10 +225,9 @@ else
         equilibrium_eq1
 end
 
-
 equilibrium_eq1 = signed_beta_star(n+1)*target_f(n+1);
 for j = 1:n
-    equilibrium_eq1 = equilibrium_eq1 + signed_beta_star(j)*target_g(n+1,j)
+    equilibrium_eq1 = equilibrium_eq1 + signed_beta_star(j)*target_g(n+1,j);
 end
 
 if equilibrium_eq1 == 0
@@ -231,15 +237,18 @@ else
 end
 
 hold on
-for i = 1:n+1
-    figure
-    plot(eigenvalues_data(:, i), '*');
-end
+figure
+%plt.scatter(real_data(i,:), imag_data(i,:));
+plot(real_data, imag_data);title('Eigenvalues evolution')
+xlabel('Re(x)')
+ylabel('Im(x)')
+xlim([-10 10]);
+legend
 hold off
 
 beta_cell = num2cell(signed_beta_star);
 coefficients = coeffs(a_J(beta_cell{:}));
-p = poly2sym(coefficients, lambda)
+p = poly2sym(coefficients, lambda);
 output = (p);
 
 

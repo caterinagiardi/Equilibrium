@@ -27,6 +27,7 @@ l = rand(1, n)
 %target = [ ];
 % sempre positiva anche target
 target = rand(1, n+1)
+target(4) = 0;
 
 % target = [0.9106, 0.8006, 0.7458, 0.8131, 0.3833, 0.6173, 0.5755, 0.5301, 0.2751, 0.2486, 0.4516];
 
